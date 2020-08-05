@@ -13,6 +13,15 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password: password
+logging:
+  level:
+    org.springframework.web: ERROR
+    ru.leodev: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    path: .\\log_file.log
 
 
 eureka:
