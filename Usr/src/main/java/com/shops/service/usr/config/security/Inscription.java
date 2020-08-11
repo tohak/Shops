@@ -1,4 +1,4 @@
-package com.shops.service.usr.config;
+package com.shops.service.usr.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
