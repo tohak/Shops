@@ -63,6 +63,8 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (userId == null) {
             return null;
         }
+        //Доп проверка на существование пользователя
+
         //В случае успеха возвращаем объект аутентификации для дальнейшей вставки в контекст
         return new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
     }

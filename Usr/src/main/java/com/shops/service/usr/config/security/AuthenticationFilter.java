@@ -12,14 +12,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
@@ -41,31 +38,40 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) {
-            LoginRequestModal details = new ObjectMapper()
-                    .readValue(request.getInputStream(), LoginRequestModal.class);
-            return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            details.getEmail(),
-                            details.getPassword(),
-                            new ArrayList<>()
-                    )
-            );
+
+        //Наша модель аутентификации которую получаем из запроса
+        LoginRequestModal details = new ObjectMapper()
+                .readValue(request.getInputStream(), LoginRequestModal.class);
+
+        //Заполняем аутентификацию данными для дальнейшей передачи
+        return getAuthenticationManager().authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        details.getEmail(),
+                        details.getPassword(),
+                        new ArrayList<>()
+                )
+        );
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
-                                            Authentication authResult) throws IOException, ServletException {
+                                            Authentication authResult) {
+        //Для начала проверяем то, что пользователь вообще есть
         String userName = ((User) authResult.getPrincipal()).getUsername();
         UserEntityDto userDetailsByEmail = userService.getUserDetailsByEmail(userName);
 
+        //Строим наш токен
         String token = Jwts.builder()
+                //Тут как раз закладываем нашего пользователя
                 .setSubject(userDetailsByEmail.getUserId())
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(Objects.requireNonNull(environment.getProperty("token.expiration_time")))))
                 .signWith(SignatureAlgorithm.HS512, environment.getProperty("token.secret"))
                 .compact();
+
+        //Заполняем ответ в который уже идёт наш токен
         response.addHeader("token", token);
-        response.addHeader("userId",userDetailsByEmail.getUserId());
+        response.addHeader("userId", userDetailsByEmail.getUserId());
     }
 }
