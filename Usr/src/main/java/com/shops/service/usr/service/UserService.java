@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -43,7 +42,7 @@ public class UserService extends AbstractService<UserEntity, UserRepository> imp
 
         return modelMapper.map(userEntity, UserEntityDto.class);
     }
-
+ 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = repository.findByEmail(email);
