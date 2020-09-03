@@ -6,6 +6,7 @@ import com.shops.service.usr.dto.UserEntityDto;
 import com.shops.service.usr.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.SneakyThrows;
 import org.apache.catalina.User;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,11 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private UserService userService;
-    private Environment environment;
+    private final UserService userService;
+    private final Environment environment;
 
     public AuthenticationFilter(UserService userService,
                                 Environment environment,
@@ -35,11 +37,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         super.setAuthenticationManager(authenticationManager);
     }
 
+    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
-
-        try {
+                                                HttpServletResponse response) {
             LoginRequestModal details = new ObjectMapper()
                     .readValue(request.getInputStream(), LoginRequestModal.class);
             return getAuthenticationManager().authenticate(
@@ -49,9 +50,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                             new ArrayList<>()
                     )
             );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -64,7 +62,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         String token = Jwts.builder()
                 .setSubject(userDetailsByEmail.getUserId())
-                .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(environment.getProperty("token.expiration_time"))))
+                .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(Objects.requireNonNull(environment.getProperty("token.expiration_time")))))
                 .signWith(SignatureAlgorithm.HS512, environment.getProperty("token.secret"))
                 .compact();
         response.addHeader("token", token);

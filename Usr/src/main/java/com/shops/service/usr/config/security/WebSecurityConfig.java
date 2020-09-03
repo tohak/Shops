@@ -1,6 +1,7 @@
 package com.shops.service.usr.config.security;
 
 import com.shops.service.usr.service.UserService;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,8 +13,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final Inscription inscription;
-    private Environment environment;
-    private UserService userService;
+    private final Environment environment;
+    private final UserService userService;
 
     public WebSecurityConfig(Inscription inscription, Environment environment, UserService userService) {
         this.inscription = inscription;
@@ -36,8 +37,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationFilter;
     }
 
+    @SneakyThrows
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth)  {
         auth.userDetailsService(userService).passwordEncoder(inscription.getPasswordEncoder());
     }
 }
