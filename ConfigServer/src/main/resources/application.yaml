@@ -1,0 +1,13 @@
+server:
+  port: 8012
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          clone-on-start: true
+          password: wasdtkil19kfs5
+          username: tohak199@gmail.com
+          uri: https://github.com/tohak/propertyShopServer

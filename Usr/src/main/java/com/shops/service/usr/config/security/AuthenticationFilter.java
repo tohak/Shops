@@ -61,7 +61,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         //Для начала проверяем то, что пользователь вообще есть
         String userName = ((User) authResult.getPrincipal()).getUsername();
         UserEntityDto userDetailsByEmail = userService.getUserDetailsByEmail(userName);
-
+        String property = environment.getProperty("token.expiration_time");
         //Строим наш токен
         String token = Jwts.builder()
                 //Тут как раз закладываем нашего пользователя
