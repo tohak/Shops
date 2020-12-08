@@ -11,3 +11,8 @@ spring:
           password: wasdtkil19kfs5
           username: tohak199@gmail.com
           uri: https://github.com/tohak/propertyShopServer
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
